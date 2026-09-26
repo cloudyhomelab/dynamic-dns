@@ -5,6 +5,7 @@
 
 - name: example.org
   hostname: router.example.net
+  ttl: 3600
 
 - name: example.net
   subdomains:

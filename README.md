@@ -46,6 +46,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 
 - name: example.org
   hostname: router.example.net
+  ttl: 3600
 
 - name: example.net
   subdomains:
@@ -59,6 +60,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 | `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`). |
 | `hostname` | no | Use the IPv4 address this hostname resolves to |
 | `ip` | no | Use this fixed IP address |
+| `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
 
 Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`.
 
@@ -67,8 +69,6 @@ Where the IP address comes from, in order:
 1. `hostname`, if set
 2. `ip`, if set
 3. otherwise, this machine's public IP address (from `checkip.amazonaws.com`)
-
-Records are created with a TTL of 600 seconds.
 
 ## Run periodically with systemd
 

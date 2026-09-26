@@ -5,7 +5,6 @@ from dataclasses import asdict
 import requests
 
 from dynamic_dns.config import (
-    DNS_RECORD_TTL,
     PORKBUN_CREATE_URL,
     PORKBUN_EDIT_URL,
     PORKBUN_RETRIEVE_URL,
@@ -13,13 +12,13 @@ from dynamic_dns.config import (
 )
 
 
-def update_dns_record(domain, sub_domain, public_ip, secret):
+def update_dns_record(domain, sub_domain, public_ip, ttl, secret):
     url = PORKBUN_EDIT_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
     data = {
         **asdict(secret),
         "content": public_ip,
-        "ttl": DNS_RECORD_TTL,
+        "ttl": str(ttl),
     }
 
     response = requests.post(url, json=data, timeout=REQUEST_TIMEOUT_SECONDS)
@@ -37,7 +36,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     return False
 
 
-def create_dns_record(domain, sub_domain, public_ip, secret):
+def create_dns_record(domain, sub_domain, public_ip, ttl, secret):
     url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
@@ -45,7 +44,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
         "name": sub_domain or "",
         "type": "A",
         "content": public_ip,
-        "ttl": DNS_RECORD_TTL,
+        "ttl": str(ttl),
     }
 
     response = requests.post(url, json=data, timeout=REQUEST_TIMEOUT_SECONDS)

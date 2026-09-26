@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import yaml
 
+from dynamic_dns.config import DNS_RECORD_TTL
+
 
 @dataclass
 class DomainConfig:
@@ -13,6 +15,7 @@ class DomainConfig:
     subdomain: str | None
     hostname: str | None
     ip: str | None
+    ttl: int
 
 
 @dataclass
@@ -34,13 +37,15 @@ def load_domains(domains_file_path):
         domains = yaml.safe_load(domains_file)
         data = []
         for item in domains:
-            if "subdomains" in item:
-                data.extend(
-                    [
-                        DomainConfig(item["name"], subdomain, item.get("hostname"), item.get("ip"))
-                        for subdomain in item.get("subdomains")
-                    ]
+            # no subdomains key means the apex record
+            for subdomain in item.get("subdomains", [None]):
+                data.append(
+                    DomainConfig(
+                        item["name"],
+                        subdomain,
+                        item.get("hostname"),
+                        item.get("ip"),
+                        item.get("ttl", DNS_RECORD_TTL),
+                    )
                 )
-            else:
-                data.append(DomainConfig(item["name"], None, item.get("hostname"), item.get("ip")))
     return data
