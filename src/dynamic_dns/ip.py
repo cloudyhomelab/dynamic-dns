@@ -1,8 +1,10 @@
 import requests
 
+from dynamic_dns.config import PUBLIC_IP_URL
+
 
 def public_ip():
-    response = requests.request("GET", "https://checkip.amazonaws.com/")
+    response = requests.request("GET", PUBLIC_IP_URL)
 
     if response.status_code == requests.codes.ok:
         return response.text.strip()

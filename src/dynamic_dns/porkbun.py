@@ -1,18 +1,17 @@
 import requests
 import json
 
-# sync dns records for domains hosted with porkbun
-PROKBUN_API_BASE_URL="https://api.porkbun.com/api/json/v3/dns"
+from dynamic_dns.config import DNS_RECORD_TTL, PORKBUN_API_BASE_URL
 
 
 def update_dns_record(domain, sub_domain, public_ip, secret):
-    url = f"{PROKBUN_API_BASE_URL}/editByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PROKBUN_API_BASE_URL}/editByNameType/{domain}/A"
+    url = f"{PORKBUN_API_BASE_URL}/editByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PORKBUN_API_BASE_URL}/editByNameType/{domain}/A"
 
     data = {
         "secretapikey": secret["secretapikey"],
         "apikey": secret["apikey"],
         "content": public_ip,
-        "ttl": "600",
+        "ttl": DNS_RECORD_TTL,
     }
 
     response = requests.post(url, data=json.dumps(data))
@@ -30,7 +29,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     return False
 
 def create_dns_record(domain, sub_domain, public_ip, secret):
-    url = f"{PROKBUN_API_BASE_URL}/create/{domain}"
+    url = f"{PORKBUN_API_BASE_URL}/create/{domain}"
 
     data = {
         "secretapikey": secret["secretapikey"],
@@ -38,7 +37,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
         "name": sub_domain or "",
         "type": "A",
         "content": public_ip,
-        "ttl": "600",
+        "ttl": DNS_RECORD_TTL,
     }
 
     response = requests.post(url, data=json.dumps(data))
@@ -57,7 +56,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
 
 
 def get_current_ip(domain, sub_domain, secret):
-    url = f"{PROKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PROKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A"
+    url = f"{PORKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PORKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A"
 
     response = requests.post(url, data=json.dumps(secret))
     if response.status_code == requests.codes.ok:
