@@ -38,7 +38,7 @@ This file holds credentials; keep it readable only by you (`chmod 600 api-keys.j
 
 ### Domains
 
-A JSON list of entries:
+A JSON list of entries (sample: [`examples/domains.json`](examples/domains.json)):
 
 ```json
 [

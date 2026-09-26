@@ -1,0 +1,15 @@
+[
+  {
+    "name": "example.com",
+    "subdomains": ["home", "vpn"]
+  },
+  {
+    "name": "example.org",
+    "hostname": "router.example.net"
+  },
+  {
+    "name": "example.net",
+    "subdomains": ["nas"],
+    "ip": "192.168.1.10"
+  }
+]
