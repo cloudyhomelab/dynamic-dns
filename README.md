@@ -13,13 +13,13 @@ uv tool install git+https://github.com/cloudyhomelab/dynamic-dns
 ## Usage
 
 ```sh
-dynamic-dns --api-keys-path api-keys.json --domains-path domains.json
+dynamic-dns --api-keys-path api-keys.json --domains-path domains.yaml
 ```
 
 | Option | Description |
 |---|---|
 | `-a`, `--api-keys-path` | JSON file with your Porkbun API keys |
-| `-d`, `--domains-path` | JSON file listing the domains and subdomains to sync |
+| `-d`, `--domains-path` | YAML file listing the domains and subdomains to sync |
 
 ## Configuration
 
@@ -38,24 +38,21 @@ This file holds credentials; keep it readable only by you (`chmod 600 api-keys.j
 
 ### Domains
 
-A JSON list of entries (sample: [`examples/domains.json`](examples/domains.json)):
+A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)):
 
-```json
-[
-  {
-    "name": "example.com",
-    "subdomains": ["home", "vpn"]
-  },
-  {
-    "name": "example.org",
-    "hostname": "router.example.net"
-  },
-  {
-    "name": "example.net",
-    "subdomains": ["nas"],
-    "ip": "192.168.1.10"
-  }
-]
+```yaml
+- name: example.com
+  subdomains:
+    - home
+    - vpn
+
+- name: example.org
+  hostname: router.example.net
+
+- name: example.net
+  subdomains:
+    - nas
+  ip: 192.168.1.10
 ```
 
 | Field | Required | Description |
@@ -64,6 +61,8 @@ A JSON list of entries (sample: [`examples/domains.json`](examples/domains.json)
 | `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`). |
 | `hostname` | no | Use the IPv4 address this hostname resolves to |
 | `ip` | no | Use this fixed IP address |
+
+Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`.
 
 Where the IP address comes from, in order:
 

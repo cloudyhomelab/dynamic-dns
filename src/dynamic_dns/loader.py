@@ -3,6 +3,8 @@
 import json
 from dataclasses import dataclass
 
+import yaml
+
 
 @dataclass
 class DomainConfig:
@@ -30,7 +32,7 @@ def load_secrets(secret_file_path):
 
 def load_domains(domains_file_path):
     with open(domains_file_path) as domains_file:
-        domains = json.load(domains_file)
+        domains = yaml.safe_load(domains_file)
         data = []
         for item in domains:
             if "subdomains" in item:

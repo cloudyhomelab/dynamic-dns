@@ -6,6 +6,7 @@ requires-python = ">=3.13"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 dependencies = [
+    "pyyaml>=6.0.3",
     "requests>=2.34.2",
 ]
 

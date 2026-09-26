@@ -39,7 +39,7 @@ def main():
         dest="domain_file",
         type=str,
         required=True,
-        help="path of the json file containing the domain/sub-domains to sync",
+        help="path of the yaml file containing the domain/sub-domains to sync",
     )
     args = parser.parse_args()
 
