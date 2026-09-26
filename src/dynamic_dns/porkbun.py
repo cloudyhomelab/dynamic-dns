@@ -1,11 +1,11 @@
 import requests
 import json
 
-from dynamic_dns.config import DNS_RECORD_TTL, PORKBUN_API_BASE_URL
+from dynamic_dns.config import DNS_RECORD_TTL, PORKBUN_CREATE_URL, PORKBUN_EDIT_URL, PORKBUN_RETRIEVE_URL
 
 
 def update_dns_record(domain, sub_domain, public_ip, secret):
-    url = f"{PORKBUN_API_BASE_URL}/editByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PORKBUN_API_BASE_URL}/editByNameType/{domain}/A"
+    url = PORKBUN_EDIT_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
     data = {
         "secretapikey": secret["secretapikey"],
@@ -29,7 +29,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     return False
 
 def create_dns_record(domain, sub_domain, public_ip, secret):
-    url = f"{PORKBUN_API_BASE_URL}/create/{domain}"
+    url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
         "secretapikey": secret["secretapikey"],
@@ -56,7 +56,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
 
 
 def get_current_ip(domain, sub_domain, secret):
-    url = f"{PORKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A/{sub_domain}" if sub_domain else f"{PORKBUN_API_BASE_URL}/retrieveByNameType/{domain}/A"
+    url = PORKBUN_RETRIEVE_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
     response = requests.post(url, data=json.dumps(secret))
     if response.status_code == requests.codes.ok:
