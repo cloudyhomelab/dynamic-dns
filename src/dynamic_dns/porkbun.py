@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
+from dataclasses import asdict
 
 import requests
 
@@ -11,8 +12,8 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     url = PORKBUN_EDIT_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
     data = {
-        "secretapikey": secret["secretapikey"],
-        "apikey": secret["apikey"],
+        "secretapikey": secret.secretapikey,
+        "apikey": secret.apikey,
         "content": public_ip,
         "ttl": DNS_RECORD_TTL,
     }
@@ -36,8 +37,8 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
     url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
-        "secretapikey": secret["secretapikey"],
-        "apikey": secret["apikey"],
+        "secretapikey": secret.secretapikey,
+        "apikey": secret.apikey,
         "name": sub_domain or "",
         "type": "A",
         "content": public_ip,
@@ -62,7 +63,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
 def get_current_ip(domain, sub_domain, secret):
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
-    response = requests.post(url, data=json.dumps(secret))
+    response = requests.post(url, data=json.dumps(asdict(secret)))
     if response.status_code == requests.codes.ok:
         records = response.json()["records"]
         if records:

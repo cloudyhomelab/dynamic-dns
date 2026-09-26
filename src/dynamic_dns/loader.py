@@ -14,10 +14,18 @@ class DomainConfig:
     ip: str | None
 
 
+@dataclass
+class ApiKeys:
+    """Porkbun API credentials."""
+
+    apikey: str
+    secretapikey: str
+
+
 def load_secrets(secret_file_path):
     with open(secret_file_path) as secret_file:
         secret = json.load(secret_file)
-    return secret
+    return ApiKeys(secret["apikey"], secret["secretapikey"])
 
 
 def load_domains(domains_file_path):
