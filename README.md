@@ -25,7 +25,7 @@ dynamic-dns --api-keys-path api-keys.json --domains-path domains.json
 
 ### API keys
 
-Create an API key in the Porkbun dashboard and enable API access for each domain you want to manage.
+Create an API key in the Porkbun dashboard and enable API access for each domain you want to manage (sample: [`examples/api-keys.json`](examples/api-keys.json)).
 
 ```json
 {
