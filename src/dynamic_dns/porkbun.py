@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
 from dataclasses import asdict
 
 import requests
@@ -12,13 +11,12 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     url = PORKBUN_EDIT_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
     data = {
-        "secretapikey": secret.secretapikey,
-        "apikey": secret.apikey,
+        **asdict(secret),
         "content": public_ip,
         "ttl": DNS_RECORD_TTL,
     }
 
-    response = requests.post(url, data=json.dumps(data))
+    response = requests.post(url, json=data)
 
     if response.status_code == requests.codes.ok:
         print("DNS records updated")
@@ -37,15 +35,14 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
     url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
-        "secretapikey": secret.secretapikey,
-        "apikey": secret.apikey,
+        **asdict(secret),
         "name": sub_domain or "",
         "type": "A",
         "content": public_ip,
         "ttl": DNS_RECORD_TTL,
     }
 
-    response = requests.post(url, data=json.dumps(data))
+    response = requests.post(url, json=data)
 
     if response.status_code == requests.codes.ok:
         print("DNS records created")
@@ -63,7 +60,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
 def get_current_ip(domain, sub_domain, secret):
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
-    response = requests.post(url, data=json.dumps(asdict(secret)))
+    response = requests.post(url, json=asdict(secret))
     if response.status_code == requests.codes.ok:
         records = response.json()["records"]
         if records:
