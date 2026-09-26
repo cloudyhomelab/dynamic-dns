@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import requests
 
 from dynamic_dns.config import PUBLIC_IP_URL
