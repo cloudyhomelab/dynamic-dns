@@ -15,16 +15,12 @@ class DomainConfig:
 
 
 def load_secrets(secret_file_path):
-    # expects json structure
-    # {'secretapikey': 'xxx', 'apikey': 'xxx'}
     with open(secret_file_path) as secret_file:
         secret = json.load(secret_file)
     return secret
 
 
 def load_domains(domains_file_path):
-    # expects json structure
-    # [{'name': 'xxx', 'subdomains': ['xxx', 'xxx', ...]} , 'hostname': 'xxxx', 'ip': 'x.x.x.x' ...]
     with open(domains_file_path) as domains_file:
         domains = json.load(domains_file)
         data = []
