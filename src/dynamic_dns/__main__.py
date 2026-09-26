@@ -1,3 +1,3 @@
-from dynamic_dns import main
+from dynamic_dns.main import main
 
 main()
