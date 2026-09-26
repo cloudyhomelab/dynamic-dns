@@ -16,11 +16,14 @@ def change_my_dns(domain, sub_domain, config_ip, secret):
     if my_ip is not None:
         if prev_ip is not None:
             if my_ip != prev_ip:
-                update_dns_record(domain, sub_domain, my_ip, secret)
+                return update_dns_record(domain, sub_domain, my_ip, secret)
             else:
                 print("No changes to update")
+                return True
         else:
-            create_dns_record(domain, sub_domain, my_ip, secret)
+            return create_dns_record(domain, sub_domain, my_ip, secret)
+
+    return False
 
 
 def main():
@@ -46,10 +49,14 @@ def main():
     secret = load_secrets(args.api_file)
     domains = load_domains(args.domain_file)
 
+    failed = 0
     for item in domains:
         ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
         if item.subdomain:
             print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {ip}")
         else:
             print(f"setting up {item.name} for hostname {item.hostname} or ip {ip}")
-        change_my_dns(item.name, item.subdomain, ip, secret)
+        if not change_my_dns(item.name, item.subdomain, ip, secret):
+            failed += 1
+
+    return 1 if failed else 0
