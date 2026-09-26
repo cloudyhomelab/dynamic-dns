@@ -47,9 +47,9 @@ def main():
     domains = load_domains(args.domain_file)
 
     for item in domains:
-        item.ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
+        ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
         if item.subdomain:
-            print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {item.ip}")
+            print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {ip}")
         else:
-            print(f"setting up {item.name} for hostname {item.hostname} or ip {item.ip}")
-        change_my_dns(item.name, item.subdomain, item.ip, secret)
+            print(f"setting up {item.name} for hostname {item.hostname} or ip {ip}")
+        change_my_dns(item.name, item.subdomain, ip, secret)
