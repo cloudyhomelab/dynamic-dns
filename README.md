@@ -72,12 +72,12 @@ Records are created with a TTL of 600 seconds.
 
 ## Run periodically with systemd
 
-[`systemd/`](systemd) has a user service and timer that sync every 5 minutes. They expect the binary in `~/.local/bin` (where `uv tool install` puts it) and the config in `~/.config/dynamic-dns/`.
+[`examples/systemd/`](examples/systemd) has a user service and timer that sync every 5 minutes. They expect the binary in `~/.local/bin` (where `uv tool install` puts it) and the config in `~/.config/dynamic-dns/`.
 
 ```sh
 mkdir -p ~/.config/dynamic-dns ~/.config/systemd/user
 cp api-keys.yaml domains.yaml ~/.config/dynamic-dns/
-cp systemd/dynamic-dns.service systemd/dynamic-dns.timer ~/.config/systemd/user/
+cp examples/systemd/dynamic-dns.service examples/systemd/dynamic-dns.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now dynamic-dns.timer
 ```
