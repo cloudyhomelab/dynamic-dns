@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
 from dataclasses import dataclass
 
 import yaml
@@ -26,7 +25,7 @@ class ApiKeys:
 
 def load_secrets(secret_file_path):
     with open(secret_file_path) as secret_file:
-        secret = json.load(secret_file)
+        secret = yaml.safe_load(secret_file)
     return ApiKeys(secret["apikey"], secret["secretapikey"])
 
 

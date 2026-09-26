@@ -13,28 +13,26 @@ uv tool install git+https://github.com/cloudyhomelab/dynamic-dns
 ## Usage
 
 ```sh
-dynamic-dns --api-keys-path api-keys.json --domains-path domains.yaml
+dynamic-dns --api-keys-path api-keys.yaml --domains-path domains.yaml
 ```
 
 | Option | Description |
 |---|---|
-| `-a`, `--api-keys-path` | JSON file with your Porkbun API keys |
+| `-a`, `--api-keys-path` | YAML file with your Porkbun API keys |
 | `-d`, `--domains-path` | YAML file listing the domains and subdomains to sync |
 
 ## Configuration
 
 ### API keys
 
-Create an API key in the Porkbun dashboard and enable API access for each domain you want to manage (sample: [`examples/api-keys.json`](examples/api-keys.json)).
+Create an API key in the Porkbun dashboard and enable API access for each domain you want to manage (sample: [`examples/api-keys.yaml`](examples/api-keys.yaml)).
 
-```json
-{
-  "apikey": "pk1_...",
-  "secretapikey": "sk1_..."
-}
+```yaml
+apikey: pk1_...
+secretapikey: sk1_...
 ```
 
-This file holds credentials; keep it readable only by you (`chmod 600 api-keys.json`).
+This file holds credentials; keep it readable only by you (`chmod 600 api-keys.yaml`).
 
 ### Domains
 

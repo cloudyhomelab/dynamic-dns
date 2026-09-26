@@ -31,7 +31,7 @@ def main():
         dest="api_file",
         type=str,
         required=True,
-        help="path of the json file containing the porkbun api keys",
+        help="path of the yaml file containing the porkbun api keys",
     )
     parser.add_argument(
         "-d",
