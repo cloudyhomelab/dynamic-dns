@@ -6,7 +6,7 @@
 #   * single line only — no body
 #   * no Co-Authored-By trailers
 #
-# Enabled via:  git config core.hooksPath .githooks
+# Run by pre-commit (see .pre-commit-config.yaml).
 
 message_file="$1"
 
