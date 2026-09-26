@@ -136,7 +136,7 @@ def change_my_dns(domain, sub_domain, config_ip, secret):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sync DNS records in Porkbun")
+    parser = argparse.ArgumentParser(prog="dynamic-dns", description="Sync DNS records in Porkbun")
     parser.add_argument(
         "-a",
         "--api-keys-path",
