@@ -9,7 +9,5 @@ def public_ip():
     if response.status_code == requests.codes.ok:
         return response.text.strip()
 
-    print(
-        "Request to fetch the public ip failed with status code:", response.status_code
-    )
+    print("Request to fetch the public ip failed with status code:", response.status_code)
     return None

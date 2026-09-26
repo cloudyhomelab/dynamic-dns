@@ -1,5 +1,6 @@
-import requests
 import json
+
+import requests
 
 from dynamic_dns.config import DNS_RECORD_TTL, PORKBUN_CREATE_URL, PORKBUN_EDIT_URL, PORKBUN_RETRIEVE_URL
 
@@ -17,7 +18,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
     response = requests.post(url, data=json.dumps(data))
 
     if response.status_code == requests.codes.ok:
-        print(f"DNS records updated")
+        print("DNS records updated")
         return True
     else:
         print(
@@ -27,6 +28,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
         print("Reason: ", response.reason)
 
     return False
+
 
 def create_dns_record(domain, sub_domain, public_ip, secret):
     url = PORKBUN_CREATE_URL.format(domain=domain)
@@ -43,7 +45,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
     response = requests.post(url, data=json.dumps(data))
 
     if response.status_code == requests.codes.ok:
-        print(f"DNS records created")
+        print("DNS records created")
         return True
     else:
         print(
@@ -67,8 +69,6 @@ def get_current_ip(domain, sub_domain, secret):
             print(f"No records entry exists for {sub_domain}.{domain}")
             return None
 
-    print(
-        "Request to fetch existing dns failed with status code:", response.status_code
-    )
+    print("Request to fetch existing dns failed with status code:", response.status_code)
     print("Reason:", response.reason)
     return None

@@ -1,8 +1,8 @@
 import argparse
 import socket
 
-from dynamic_dns.loader import load_domains, load_secrets
 from dynamic_dns.ip import public_ip
+from dynamic_dns.loader import load_domains, load_secrets
 from dynamic_dns.porkbun import create_dns_record, get_current_ip, update_dns_record
 
 

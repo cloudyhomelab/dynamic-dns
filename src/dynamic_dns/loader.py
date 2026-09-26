@@ -1,10 +1,11 @@
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 
 
 @dataclass
 class DomainConfig:
     """Class for keeping track of domain configurations."""
+
     name: str
     subdomain: str
     hostname: str
@@ -27,7 +28,12 @@ def load_domains(domains_file_path):
         data = []
         for item in domains:
             if "subdomains" in item:
-                data.extend([DomainConfig (item["name"],subdomain,item.get("hostname"),item.get("ip")) for subdomain in item.get("subdomains")])
+                data.extend(
+                    [
+                        DomainConfig(item["name"], subdomain, item.get("hostname"), item.get("ip"))
+                        for subdomain in item.get("subdomains")
+                    ]
+                )
             else:
-                data.append(DomainConfig (item["name"],None,item.get("hostname"),item.get("ip")))
+                data.append(DomainConfig(item["name"], None, item.get("hostname"), item.get("ip")))
     return data
