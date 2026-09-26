@@ -135,7 +135,7 @@ def change_my_dns(domain, sub_domain, config_ip, secret):
             create_dns_record(domain, sub_domain, my_ip, secret)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Sync DNS records in Porkbun")
     parser.add_argument(
         "-a",
@@ -159,9 +159,9 @@ if __name__ == "__main__":
     domains = load_domains(args.domain_file)
 
     for item in domains:
-            item.ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
-            if item.subdomain:
-                print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {item.ip}")
-            else:
-                print(f"setting up {item.name} for hostname {item.hostname} or ip {item.ip}")
-            change_my_dns(item.name, item.subdomain, item.ip, secret)
+        item.ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
+        if item.subdomain:
+            print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {item.ip}")
+        else:
+            print(f"setting up {item.name} for hostname {item.hostname} or ip {item.ip}")
+        change_my_dns(item.name, item.subdomain, item.ip, secret)

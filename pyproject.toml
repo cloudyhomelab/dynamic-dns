@@ -1,0 +1,15 @@
+[project]
+name = "dynamic-dns"
+version = "0.1.0"
+description = "Sync DNS A records for domains hosted with Porkbun"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+dynamic-dns = "dynamic_dns:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13"]
+build-backend = "uv_build"
