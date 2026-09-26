@@ -3,6 +3,8 @@
 import argparse
 import socket
 
+import requests
+
 from dynamic_dns.ip import public_ip
 from dynamic_dns.loader import load_domains, load_secrets
 from dynamic_dns.porkbun import create_dns_record, get_current_ip, update_dns_record
@@ -51,12 +53,15 @@ def main():
 
     failed = 0
     for item in domains:
-        ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
-        if item.subdomain:
-            print(f"setting up {item.subdomain}.{item.name} for hostname {item.hostname} or ip {ip}")
-        else:
-            print(f"setting up {item.name} for hostname {item.hostname} or ip {ip}")
-        if not change_my_dns(item.name, item.subdomain, ip, secret):
+        fqdn = f"{item.subdomain}.{item.name}" if item.subdomain else item.name
+        # socket.gaierror (unresolvable hostname) is an OSError
+        try:
+            ip = socket.gethostbyname(item.hostname) if item.hostname else item.ip
+            print(f"setting up {fqdn} for hostname {item.hostname} or ip {ip}")
+            if not change_my_dns(item.name, item.subdomain, ip, secret):
+                failed += 1
+        except (requests.RequestException, OSError) as e:
+            print(f"Failed to sync {fqdn}: {e}")
             failed += 1
 
     return 1 if failed else 0

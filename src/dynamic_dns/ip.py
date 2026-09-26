@@ -2,11 +2,11 @@
 
 import requests
 
-from dynamic_dns.config import PUBLIC_IP_URL
+from dynamic_dns.config import PUBLIC_IP_URL, REQUEST_TIMEOUT_SECONDS
 
 
 def public_ip():
-    response = requests.request("GET", PUBLIC_IP_URL)
+    response = requests.request("GET", PUBLIC_IP_URL, timeout=REQUEST_TIMEOUT_SECONDS)
 
     if response.status_code == requests.codes.ok:
         return response.text.strip()

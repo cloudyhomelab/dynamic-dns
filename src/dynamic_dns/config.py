@@ -6,3 +6,4 @@ PORKBUN_CREATE_URL = PORKBUN_API_BASE_URL + "/create/{domain}"
 PORKBUN_RETRIEVE_URL = PORKBUN_API_BASE_URL + "/retrieveByNameType/{domain}/A/{subdomain}"
 PUBLIC_IP_URL = "https://checkip.amazonaws.com/"
 DNS_RECORD_TTL = "600"
+REQUEST_TIMEOUT_SECONDS = 10

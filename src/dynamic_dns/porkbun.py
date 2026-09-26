@@ -4,7 +4,13 @@ from dataclasses import asdict
 
 import requests
 
-from dynamic_dns.config import DNS_RECORD_TTL, PORKBUN_CREATE_URL, PORKBUN_EDIT_URL, PORKBUN_RETRIEVE_URL
+from dynamic_dns.config import (
+    DNS_RECORD_TTL,
+    PORKBUN_CREATE_URL,
+    PORKBUN_EDIT_URL,
+    PORKBUN_RETRIEVE_URL,
+    REQUEST_TIMEOUT_SECONDS,
+)
 
 
 def update_dns_record(domain, sub_domain, public_ip, secret):
@@ -16,7 +22,7 @@ def update_dns_record(domain, sub_domain, public_ip, secret):
         "ttl": DNS_RECORD_TTL,
     }
 
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data, timeout=REQUEST_TIMEOUT_SECONDS)
 
     if response.status_code == requests.codes.ok:
         print("DNS records updated")
@@ -42,7 +48,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
         "ttl": DNS_RECORD_TTL,
     }
 
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data, timeout=REQUEST_TIMEOUT_SECONDS)
 
     if response.status_code == requests.codes.ok:
         print("DNS records created")
@@ -60,7 +66,7 @@ def create_dns_record(domain, sub_domain, public_ip, secret):
 def get_current_ip(domain, sub_domain, secret):
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
 
-    response = requests.post(url, json=asdict(secret))
+    response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
     if response.status_code == requests.codes.ok:
         records = response.json()["records"]
         if records:
