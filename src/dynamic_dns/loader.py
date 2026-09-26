@@ -9,9 +9,9 @@ class DomainConfig:
     """Class for keeping track of domain configurations."""
 
     name: str
-    subdomain: str
-    hostname: str
-    ip: str
+    subdomain: str | None
+    hostname: str | None
+    ip: str | None
 
 
 def load_secrets(secret_file_path):
