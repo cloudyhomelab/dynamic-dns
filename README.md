@@ -70,6 +70,26 @@ Where the IP address comes from, in order:
 
 Records are created with a TTL of 600 seconds.
 
+## Run periodically with systemd
+
+[`systemd/`](systemd) has a user service and timer that sync every 5 minutes. They expect the binary in `~/.local/bin` (where `uv tool install` puts it) and the config in `~/.config/dynamic-dns/`.
+
+```sh
+mkdir -p ~/.config/dynamic-dns ~/.config/systemd/user
+cp api-keys.yaml domains.yaml ~/.config/dynamic-dns/
+cp systemd/dynamic-dns.service systemd/dynamic-dns.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now dynamic-dns.timer
+```
+
+User timers only run while you are logged in. To keep them running after logout and start them at boot:
+
+```sh
+loginctl enable-linger
+```
+
+Check the logs with `journalctl --user -u dynamic-dns`.
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).

@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=Sync Porkbun DNS records
+
+[Service]
+Type=oneshot
+# %h: home directory, %E: $XDG_CONFIG_HOME (~/.config)
+ExecStart=%h/.local/bin/dynamic-dns --api-keys-path %E/dynamic-dns/api-keys.yaml --domains-path %E/dynamic-dns/domains.yaml
