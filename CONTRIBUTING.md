@@ -27,3 +27,5 @@ Run all hooks against the whole tree:
 ```sh
 uv run pre-commit run --all-files
 ```
+
+CI (`.github/workflows/checks.yml`) runs the same two steps, `uv sync --locked` and `uv run pre-commit run --all-files`, on every push and pull request, so skipping the hooks locally with `--no-verify` still gets caught.
