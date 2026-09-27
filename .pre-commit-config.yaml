@@ -15,10 +15,16 @@ repos:
         entry: uv run ruff format
         language: system
         types_or: [python, pyi]
-      # checks the whole package (files in pyproject.toml), not just the staged files
+      # mypy and pytest check the whole project, not just the staged files
       - id: mypy
         name: mypy
         entry: uv run mypy
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
+      - id: pytest
+        name: pytest
+        entry: uv run pytest -q
         language: system
         types_or: [python, pyi]
         pass_filenames: false

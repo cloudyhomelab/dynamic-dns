@@ -10,18 +10,18 @@ from dynamic_dns.loader import ApiKeys, DomainConfig, load_domains, load_secrets
 EXAMPLES = Path(__file__).parent.parent / "examples"
 
 
-def write(tmp_path, text):
+def write(tmp_path: Path, text: str) -> str:
     path = tmp_path / "config.yaml"
     path.write_text(text)
     return str(path)
 
 
-def test_examples_load():
+def test_examples_load() -> None:
     assert load_secrets(str(EXAMPLES / "api-keys.yaml")) == ApiKeys("pk1_...", "sk1_...")
     assert len(load_domains(str(EXAMPLES / "domains.yaml"))) == 5
 
 
-def test_entries_expand_to_one_record_per_subdomain_with_defaults(tmp_path):
+def test_entries_expand_to_one_record_per_subdomain_with_defaults(tmp_path: Path) -> None:
     path = write(tmp_path, "- name: example.com\n  subdomains: [home, vpn]\n  ttl: 3600\n- name: example.org\n")
 
     assert load_domains(path) == [
@@ -31,11 +31,11 @@ def test_entries_expand_to_one_record_per_subdomain_with_defaults(tmp_path):
     ]
 
 
-def test_null_subdomains_means_the_apex(tmp_path):
+def test_null_subdomains_means_the_apex(tmp_path: Path) -> None:
     assert [d.subdomain for d in load_domains(write(tmp_path, "- name: example.com\n  subdomains:\n"))] == [None]
 
 
-def test_json_config_still_loads(tmp_path):
+def test_json_config_still_loads(tmp_path: Path) -> None:
     assert load_domains(write(tmp_path, '[{"name": "example.com", "ip": "1.2.3.4"}]'))[0].ip == "1.2.3.4"
 
 
@@ -59,7 +59,7 @@ def test_json_config_still_loads(tmp_path):
         ("- name: example.com\n- example.org\n", "entry 2: expected a mapping"),
     ],
 )
-def test_invalid_domains_are_rejected(tmp_path, yaml_text, message):
+def test_invalid_domains_are_rejected(tmp_path: Path, yaml_text: str, message: str) -> None:
     with pytest.raises((TypeError, ValueError), match=message.replace("|", r"\|").replace("[", r"\[")):
         load_domains(write(tmp_path, yaml_text))
 
@@ -74,7 +74,7 @@ def test_invalid_domains_are_rejected(tmp_path, yaml_text, message):
         ("", "expected apikey and secretapikey, got NoneType"),
     ],
 )
-def test_invalid_api_keys_are_rejected(tmp_path, yaml_text, message):
+def test_invalid_api_keys_are_rejected(tmp_path: Path, yaml_text: str, message: str) -> None:
     with pytest.raises((TypeError, ValueError), match=message) as error:
         load_secrets(write(tmp_path, yaml_text))
     assert "12345678901234" not in str(error.value)
