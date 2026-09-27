@@ -4,6 +4,8 @@ Sync DNS A records for domains hosted with Porkbun.
 
 For each configured domain or subdomain, dynamic-dns looks up the current A record in Porkbun. It creates the record if it is missing and updates it if the IP address has changed.
 
+Only IPv4 is supported for now: it manages A records (no AAAA), `hostname` and the public IP are resolved to IPv4 addresses, and `ip` must be an IPv4 address.
+
 ## Install
 
 ```sh
