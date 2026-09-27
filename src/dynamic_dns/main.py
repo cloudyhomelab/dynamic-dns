@@ -83,7 +83,11 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    secret = load_secrets(args.api_file)
+    try:
+        secret = load_secrets(args.api_file)
+    except (TypeError, ValueError) as e:
+        print(f"Invalid api keys config {args.api_file}: {e}")
+        return 1
     try:
         domains = load_domains(args.domain_file)
     except (TypeError, ValueError) as e:

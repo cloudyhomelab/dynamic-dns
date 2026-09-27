@@ -3,7 +3,7 @@
 import ipaddress
 from dataclasses import dataclass
 from types import UnionType
-from typing import Any, get_args, get_origin, get_type_hints
+from typing import Any, cast, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -17,7 +17,32 @@ def _matches(value: object, expected: Any) -> bool:
 
 
 @dataclass
-class DomainEntry:
+class _Validated:
+    """Checks every field against its type annotation on construction."""
+
+    def _prefix(self) -> str:
+        return ""
+
+    def _describe(self, value: object) -> str:
+        return repr(value)
+
+    def __post_init__(self) -> None:
+        # YAML reads unquoted no/on/1 as bool/int, which would reach Porkbun as "False" etc.
+        # bool is an int subclass, so reject it for non-bool fields explicitly
+        for name, expected in get_type_hints(type(self)).items():
+            value = getattr(self, name)
+            if value is None and not _matches(value, expected):
+                raise TypeError(f"{self._prefix()}{name} is missing")
+            if (isinstance(value, bool) and expected is not bool) or not _matches(value, expected):
+                hint = "; quote it in the YAML" if expected in (str, str | None) else ""
+                raise TypeError(
+                    f"{self._prefix()}{name} must be {getattr(expected, '__name__', expected)}, "
+                    f"got {self._describe(value)}{hint}"
+                )
+
+
+@dataclass
+class DomainEntry(_Validated):
     """One entry of the domains YAML, validated on construction."""
 
     name: str
@@ -28,16 +53,11 @@ class DomainEntry:
     ttl: int
     delete_stale: bool
 
+    def _prefix(self) -> str:
+        return f"{self.name}: " if isinstance(self.name, str) else ""
+
     def __post_init__(self) -> None:
-        # YAML reads unquoted no/on/1 as bool/int, which would reach Porkbun as "False" etc.
-        # bool is an int subclass, so reject it for non-bool fields explicitly
-        for name, expected in get_type_hints(type(self)).items():
-            value = getattr(self, name)
-            if (isinstance(value, bool) and expected is not bool) or not _matches(value, expected):
-                hint = "; quote it in the YAML" if expected in (str, str | None) else ""
-                raise TypeError(
-                    f"{self.name}: {name} must be {getattr(expected, '__name__', expected)}, got {value!r}{hint}"
-                )
+        super().__post_init__()
         # an empty list is likely unfinished config; don't guess the apex and overwrite it
         if self.subdomains == []:
             raise ValueError(f"{self.name}: subdomains is empty; remove it to sync the domain itself")
@@ -64,17 +84,30 @@ class DomainConfig:
 
 
 @dataclass
-class ApiKeys:
+class ApiKeys(_Validated):
     """Porkbun API credentials."""
 
     apikey: str
     secretapikey: str
 
+    def _describe(self, value: object) -> str:
+        # never echo credentials into the terminal or the journal
+        return type(value).__name__
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        for name in ("apikey", "secretapikey"):
+            if not getattr(self, name).strip():
+                raise ValueError(f"{name} is empty")
+
 
 def load_secrets(secret_file_path: str) -> ApiKeys:
     with open(secret_file_path) as secret_file:
         secret = yaml.safe_load(secret_file)
-    return ApiKeys(secret["apikey"], secret["secretapikey"])
+    if not isinstance(secret, dict):
+        raise TypeError(f"expected apikey and secretapikey, got {type(secret).__name__}")
+    # a missing key arrives as None and is rejected by ApiKeys.__post_init__
+    return ApiKeys(cast(str, secret.get("apikey")), cast(str, secret.get("secretapikey")))
 
 
 def load_domains(domains_file_path: str) -> list[DomainConfig]:
