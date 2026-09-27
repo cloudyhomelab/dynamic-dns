@@ -47,7 +47,11 @@ def main():
     args = parser.parse_args()
 
     secret = load_secrets(args.api_file)
-    domains = load_domains(args.domain_file)
+    try:
+        domains = load_domains(args.domain_file)
+    except TypeError as e:
+        print(f"Invalid domains config {args.domain_file}: {e}")
+        return 1
 
     lookup = IpLookup()
     failed = 0

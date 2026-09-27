@@ -62,7 +62,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 | `ip` | no | Use this fixed IP address |
 | `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
 
-Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`.
+Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`; unquoted, the config is rejected.
 
 Where the IP address comes from, in order:
 
