@@ -14,6 +14,14 @@ uv run pre-commit install
 
 Clones that previously used `core.hooksPath` need `git config --unset core.hooksPath` first; pre-commit refuses to install while it is set.
 
+Run the tests:
+
+```sh
+uv run pytest
+```
+
+They mock the network at `requests` and `socket.getaddrinfo`, with an in-memory Porkbun in `tests/conftest.py`, so they never touch the real API.
+
 Run all hooks against the whole tree:
 
 ```sh

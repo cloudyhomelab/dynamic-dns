@@ -39,3 +39,6 @@ notice-rgx = "SPDX-License-Identifier: GPL-3.0-or-later"
 [tool.mypy]
 strict = true
 files = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
