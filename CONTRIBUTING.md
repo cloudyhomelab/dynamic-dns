@@ -29,3 +29,5 @@ uv run pre-commit run --all-files
 ```
 
 CI (`.github/workflows/checks.yml`) runs the same two steps, `uv sync --locked` and `uv run pre-commit run --all-files`, on every push and pull request, so skipping the hooks locally with `--no-verify` still gets caught.
+
+Branch protection should require only the `all checks passed` job. It fails if any job it depends on fails, is cancelled or is skipped, so new jobs only need adding to its `needs` list.
