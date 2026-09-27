@@ -81,12 +81,9 @@ def get_current_ip(domain, sub_domain, record_type, secret):
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
-    if response.status_code == requests.codes.ok:
-        records = response.json()["records"]
-        if records:
-            return records[0]["content"]
-        return None
-
-    print("Request to fetch existing dns failed with status code:", response.status_code)
-    print("Reason:", response.reason)
+    # raise on errors so that None only ever means "no record"; otherwise a failed lookup creates a duplicate
+    response.raise_for_status()
+    records = response.json()["records"]
+    if records:
+        return records[0]["content"]
     return None
