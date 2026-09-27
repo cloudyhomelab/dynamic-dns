@@ -12,7 +12,8 @@ class DomainConfig:
     """Class for keeping track of domain configurations."""
 
     name: str
-    subdomain: str | None
+    # None means the apex record
+    subdomains: list | None
     hostname: str | None
     ip: str | None
     ttl: int
@@ -24,8 +25,11 @@ class DomainConfig:
             value = getattr(self, field.name)
             if isinstance(value, bool) or not isinstance(value, field.type):
                 expected = getattr(field.type, "__name__", field.type)
-                hint = "" if field.type is int else "; quote it in the YAML"
+                hint = "; quote it in the YAML" if field.type in (str, str | None) else ""
                 raise TypeError(f"{self.name}: {field.name} must be {expected}, got {value!r}{hint}")
+        for subdomain in self.subdomains or []:
+            if not isinstance(subdomain, str):
+                raise TypeError(f"{self.name}: subdomains must be str, got {subdomain!r}; quote it in the YAML")
 
 
 @dataclass
@@ -45,20 +49,13 @@ def load_secrets(secret_file_path):
 def load_domains(domains_file_path):
     with open(domains_file_path) as domains_file:
         domains = yaml.safe_load(domains_file)
-        data = []
-        for item in domains:
-            # no subdomains key means the apex record
-            subdomains = item.get("subdomains", [None])
-            if not isinstance(subdomains, list):
-                raise TypeError(f"subdomains must be a list, got {subdomains!r}")
-            for subdomain in subdomains:
-                data.append(
-                    DomainConfig(
-                        item.get("name"),
-                        subdomain,
-                        item.get("hostname"),
-                        item.get("ip"),
-                        item.get("ttl", DNS_RECORD_TTL),
-                    )
-                )
-    return data
+    return [
+        DomainConfig(
+            item.get("name"),
+            item.get("subdomains"),
+            item.get("hostname"),
+            item.get("ip"),
+            item.get("ttl", DNS_RECORD_TTL),
+        )
+        for item in domains
+    ]
