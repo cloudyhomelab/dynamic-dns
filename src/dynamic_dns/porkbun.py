@@ -71,7 +71,8 @@ def get_current_ip(domain, sub_domain, secret):
         if records:
             return records[0]["content"]
         else:
-            print(f"No records entry exists for {sub_domain}.{domain}")
+            fqdn = f"{sub_domain}.{domain}" if sub_domain else domain
+            print(f"No records entry exists for {fqdn}")
             return None
 
     print("Request to fetch existing dns failed with status code:", response.status_code)
