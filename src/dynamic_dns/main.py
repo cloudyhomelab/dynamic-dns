@@ -26,6 +26,18 @@ def change_my_dns(domain, sub_domain, my_ip, ttl, secret):
     return False
 
 
+def sync_record(record, lookup, secret):
+    fqdn = f"{record.subdomain}.{record.name}" if record.subdomain else record.name
+    # socket.gaierror (unresolvable hostname) is an OSError
+    try:
+        ip = lookup.resolve(record.hostname) if record.hostname else record.ip or lookup.resolve()
+        print(f"setting up {fqdn} for hostname {record.hostname} or ip {ip}")
+        return change_my_dns(record.name, record.subdomain, ip, record.ttl, secret)
+    except (requests.RequestException, OSError) as e:
+        print(f"Failed to sync {fqdn}: {e}")
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(prog="dynamic-dns", description="Sync DNS records in Porkbun")
     parser.add_argument(
@@ -55,16 +67,8 @@ def main():
 
     lookup = IpLookup()
     failed = 0
-    for item in domains:
-        fqdn = f"{item.subdomain}.{item.name}" if item.subdomain else item.name
-        # socket.gaierror (unresolvable hostname) is an OSError
-        try:
-            ip = lookup.resolve(item.hostname) if item.hostname else item.ip or lookup.resolve()
-            print(f"setting up {fqdn} for hostname {item.hostname} or ip {ip}")
-            if not change_my_dns(item.name, item.subdomain, ip, item.ttl, secret):
-                failed += 1
-        except (requests.RequestException, OSError) as e:
-            print(f"Failed to sync {fqdn}: {e}")
+    for record in domains:
+        if not sync_record(record, lookup, secret):
             failed += 1
 
     return 1 if failed else 0
