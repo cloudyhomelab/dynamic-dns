@@ -8,8 +8,8 @@ from dynamic_dns.config import DNS_RECORD_TTL
 
 
 @dataclass
-class DomainConfig:
-    """Class for keeping track of domain configurations."""
+class DomainEntry:
+    """One entry of the domains YAML, validated on construction."""
 
     name: str
     # None means the apex record
@@ -33,6 +33,17 @@ class DomainConfig:
 
 
 @dataclass
+class DomainConfig:
+    """One DNS record to sync."""
+
+    name: str
+    subdomain: str | None
+    hostname: str | None
+    ip: str | None
+    ttl: int
+
+
+@dataclass
 class ApiKeys:
     """Porkbun API credentials."""
 
@@ -49,8 +60,8 @@ def load_secrets(secret_file_path):
 def load_domains(domains_file_path):
     with open(domains_file_path) as domains_file:
         domains = yaml.safe_load(domains_file)
-    return [
-        DomainConfig(
+    entries = [
+        DomainEntry(
             item.get("name"),
             item.get("subdomains"),
             item.get("hostname"),
@@ -58,4 +69,9 @@ def load_domains(domains_file_path):
             item.get("ttl", DNS_RECORD_TTL),
         )
         for item in domains
+    ]
+    return [
+        DomainConfig(entry.name, subdomain, entry.hostname, entry.ip, entry.ttl)
+        for entry in entries
+        for subdomain in (entry.subdomains if entry.subdomains is not None else [None])
     ]

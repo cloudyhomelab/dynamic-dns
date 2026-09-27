@@ -56,16 +56,15 @@ def main():
     lookup = IpLookup()
     failed = 0
     for item in domains:
-        for subdomain in item.subdomains if item.subdomains is not None else [None]:
-            fqdn = f"{subdomain}.{item.name}" if subdomain else item.name
-            # socket.gaierror (unresolvable hostname) is an OSError
-            try:
-                ip = lookup.resolve(item.hostname) if item.hostname else item.ip or lookup.resolve()
-                print(f"setting up {fqdn} for hostname {item.hostname} or ip {ip}")
-                if not change_my_dns(item.name, subdomain, ip, item.ttl, secret):
-                    failed += 1
-            except (requests.RequestException, OSError) as e:
-                print(f"Failed to sync {fqdn}: {e}")
+        fqdn = f"{item.subdomain}.{item.name}" if item.subdomain else item.name
+        # socket.gaierror (unresolvable hostname) is an OSError
+        try:
+            ip = lookup.resolve(item.hostname) if item.hostname else item.ip or lookup.resolve()
+            print(f"setting up {fqdn} for hostname {item.hostname} or ip {ip}")
+            if not change_my_dns(item.name, item.subdomain, ip, item.ttl, secret):
                 failed += 1
+        except (requests.RequestException, OSError) as e:
+            print(f"Failed to sync {fqdn}: {e}")
+            failed += 1
 
     return 1 if failed else 0
