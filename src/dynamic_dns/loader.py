@@ -29,6 +29,9 @@ class DomainEntry:
                 expected = getattr(field.type, "__name__", field.type)
                 hint = "; quote it in the YAML" if field.type in (str, str | None) else ""
                 raise TypeError(f"{self.name}: {field.name} must be {expected}, got {value!r}{hint}")
+        # an empty list is likely unfinished config; don't guess the apex and overwrite it
+        if self.subdomains == []:
+            raise ValueError(f"{self.name}: subdomains is empty; remove it to sync the domain itself")
         for subdomain in self.subdomains or []:
             if not isinstance(subdomain, str):
                 raise TypeError(f"{self.name}: subdomains must be str, got {subdomain!r}; quote it in the YAML")

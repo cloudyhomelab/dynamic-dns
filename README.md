@@ -65,7 +65,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 | Field | Required | Description |
 |---|---|---|
 | `name` | yes | Domain registered with Porkbun |
-| `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`). |
+| `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`); an empty list is rejected. |
 | `hostname` | no | Use the addresses this hostname resolves to: its first IPv4 (A) and first IPv6 (AAAA) address |
 | `ip` | no | Use this fixed IPv4 or IPv6 address. Quote IPv6 addresses. |
 | `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
