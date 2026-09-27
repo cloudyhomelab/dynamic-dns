@@ -6,6 +6,7 @@
 - name: example.org
   hostname: router.example.net
   ttl: 3600
+  delete_stale: true
 
 - name: example.net
   subdomains:

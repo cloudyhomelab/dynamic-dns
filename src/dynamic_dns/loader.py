@@ -18,13 +18,14 @@ class DomainEntry:
     hostname: str | None
     ip: str | None
     ttl: int
+    delete_stale: bool
 
     def __post_init__(self):
         # YAML reads unquoted no/on/1 as bool/int, which would reach Porkbun as "False" etc.
-        # bool is an int subclass, and no field is a bool
+        # bool is an int subclass, so reject it for non-bool fields explicitly
         for field in fields(self):
             value = getattr(self, field.name)
-            if isinstance(value, bool) or not isinstance(value, field.type):
+            if (isinstance(value, bool) and field.type is not bool) or not isinstance(value, field.type):
                 expected = getattr(field.type, "__name__", field.type)
                 hint = "; quote it in the YAML" if field.type in (str, str | None) else ""
                 raise TypeError(f"{self.name}: {field.name} must be {expected}, got {value!r}{hint}")
@@ -47,6 +48,7 @@ class DomainConfig:
     hostname: str | None
     ip: str | None
     ttl: int
+    delete_stale: bool
 
 
 @dataclass
@@ -73,11 +75,12 @@ def load_domains(domains_file_path):
             item.get("hostname"),
             item.get("ip"),
             item.get("ttl", DNS_RECORD_TTL),
+            item.get("delete_stale", False),
         )
         for item in domains
     ]
     return [
-        DomainConfig(entry.name, subdomain, entry.hostname, entry.ip, entry.ttl)
+        DomainConfig(entry.name, subdomain, entry.hostname, entry.ip, entry.ttl, entry.delete_stale)
         for entry in entries
         for subdomain in (entry.subdomains if entry.subdomains is not None else [None])
     ]

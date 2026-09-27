@@ -7,11 +7,13 @@ import requests
 
 from dynamic_dns.ip import IpLookup
 from dynamic_dns.loader import load_domains, load_secrets
-from dynamic_dns.porkbun import create_dns_record, get_current_ip, update_dns_record
+from dynamic_dns.porkbun import create_dns_record, delete_dns_record, get_current_ip, update_dns_record
+
+RECORD_TYPES = {4: "A", 6: "AAAA"}
 
 
 def change_my_dns(domain, sub_domain, address, ttl, secret):
-    record_type = "AAAA" if address.version == 6 else "A"
+    record_type = RECORD_TYPES[address.version]
     prev_ip = get_current_ip(domain, sub_domain, record_type, secret)
 
     if prev_ip is not None:
@@ -20,7 +22,17 @@ def change_my_dns(domain, sub_domain, address, ttl, secret):
             return update_dns_record(domain, sub_domain, record_type, str(address), ttl, secret)
         print("No changes to update")
         return True
+    fqdn = f"{sub_domain}.{domain}" if sub_domain else domain
+    print(f"No {record_type} record exists for {fqdn}")
     return create_dns_record(domain, sub_domain, record_type, str(address), ttl, secret)
+
+
+def delete_stale_record(domain, sub_domain, record_type, secret):
+    if get_current_ip(domain, sub_domain, record_type, secret) is None:
+        return True
+    fqdn = f"{sub_domain}.{domain}" if sub_domain else domain
+    print(f"Deleting stale {record_type} record for {fqdn}")
+    return delete_dns_record(domain, sub_domain, record_type, secret)
 
 
 def sync_record(record, lookup, secret):
@@ -38,6 +50,12 @@ def sync_record(record, lookup, secret):
         for address in addresses:
             print(f"setting up {fqdn} for hostname {record.hostname} or ip {address}")
             results.append(change_my_dns(record.name, record.subdomain, address, record.ttl, secret))
+        # a missing family is only certain for hostname and ip; a failed public IPv6 lookup may be transient
+        if record.delete_stale and (record.hostname or record.ip):
+            synced = {address.version for address in addresses}
+            for version, record_type in RECORD_TYPES.items():
+                if version not in synced:
+                    results.append(delete_stale_record(record.name, record.subdomain, record_type, secret))
         return all(results)
     except (requests.RequestException, OSError, ValueError) as e:
         print(f"Failed to sync {fqdn}: {e}")

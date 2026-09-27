@@ -6,6 +6,7 @@ import requests
 
 from dynamic_dns.config import (
     PORKBUN_CREATE_URL,
+    PORKBUN_DELETE_URL,
     PORKBUN_EDIT_URL,
     PORKBUN_RETRIEVE_URL,
     REQUEST_TIMEOUT_SECONDS,
@@ -62,6 +63,20 @@ def create_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
     return False
 
 
+def delete_dns_record(domain, sub_domain, record_type, secret):
+    url = PORKBUN_DELETE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
+
+    response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
+
+    if response.status_code == requests.codes.ok:
+        print("DNS records deleted")
+        return True
+
+    print("Request to delete dns record failed with status code:", response.status_code)
+    print("Reason:", response.reason)
+    return False
+
+
 def get_current_ip(domain, sub_domain, record_type, secret):
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
@@ -70,10 +85,7 @@ def get_current_ip(domain, sub_domain, record_type, secret):
         records = response.json()["records"]
         if records:
             return records[0]["content"]
-        else:
-            fqdn = f"{sub_domain}.{domain}" if sub_domain else domain
-            print(f"No records entry exists for {fqdn}")
-            return None
+        return None
 
     print("Request to fetch existing dns failed with status code:", response.status_code)
     print("Reason:", response.reason)

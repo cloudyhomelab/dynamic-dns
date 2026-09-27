@@ -49,6 +49,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 - name: example.org
   hostname: router.example.net
   ttl: 3600
+  delete_stale: true
 
 - name: example.net
   subdomains:
@@ -68,6 +69,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 | `hostname` | no | Use the addresses this hostname resolves to: its first IPv4 (A) and first IPv6 (AAAA) address |
 | `ip` | no | Use this fixed IPv4 or IPv6 address. Quote IPv6 addresses. |
 | `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
+| `delete_stale` | no | `true` to delete the A or AAAA record when that address family is gone (default `false`) |
 
 Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`; unquoted, the config is rejected.
 
@@ -76,6 +78,8 @@ Where the IP addresses come from, in order:
 1. `hostname`, if set
 2. `ip`, if set
 3. otherwise, this machine's public IPv4 address (from `checkip.amazonaws.com`, required) and public IPv6 address (from `api6.ipify.org`, skipped with a note if the machine has no IPv6)
+
+With `delete_stale: true`, the entry owns both its A and AAAA records. When its `hostname` resolves without an IPv6 address, or its fixed `ip` is IPv4, the existing AAAA record is deleted (and the other way round for A). Entries that use the public IP never delete: a failed IPv6 lookup may be temporary. Leave it off if you manage some of these records by hand.
 
 ## Run periodically with systemd
 
