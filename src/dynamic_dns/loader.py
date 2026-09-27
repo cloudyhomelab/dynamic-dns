@@ -52,6 +52,7 @@ class DomainEntry(_Validated):
     ip: str | None
     ttl: int
     delete_stale: bool
+    delete_extra: bool
 
     def _prefix(self) -> str:
         return f"{self.name}: " if isinstance(self.name, str) else ""
@@ -81,6 +82,7 @@ class DomainConfig:
     ip: str | None
     ttl: int
     delete_stale: bool
+    delete_extra: bool
 
 
 @dataclass
@@ -126,11 +128,12 @@ def load_domains(domains_file_path: str) -> list[DomainConfig]:
             item.get("ip"),
             item.get("ttl", DNS_RECORD_TTL),
             item.get("delete_stale", False),
+            item.get("delete_extra", True),
         )
         for item in domains
     ]
     return [
-        DomainConfig(entry.name, subdomain, entry.hostname, entry.ip, entry.ttl, entry.delete_stale)
+        DomainConfig(entry.name, subdomain, entry.hostname, entry.ip, entry.ttl, entry.delete_stale, entry.delete_extra)
         for entry in entries
         for subdomain in (entry.subdomains if entry.subdomains is not None else [None])
     ]
