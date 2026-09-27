@@ -113,6 +113,11 @@ def load_secrets(secret_file_path: str) -> ApiKeys:
 def load_domains(domains_file_path: str) -> list[DomainConfig]:
     with open(domains_file_path) as domains_file:
         domains = yaml.safe_load(domains_file)
+    if not isinstance(domains, list):
+        raise TypeError(f"expected a list of entries (each starting with '- name:'), got {type(domains).__name__}")
+    for index, item in enumerate(domains, 1):
+        if not isinstance(item, dict):
+            raise TypeError(f"entry {index}: expected a mapping with name, got {item!r}")
     entries = [
         DomainEntry(
             item.get("name"),
