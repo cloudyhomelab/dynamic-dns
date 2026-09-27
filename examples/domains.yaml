@@ -11,3 +11,8 @@
   subdomains:
     - nas
   ip: 192.168.1.10
+
+- name: example.net
+  subdomains:
+    - nas6
+  ip: "2001:db8::10"

@@ -12,8 +12,8 @@ from dynamic_dns.config import (
 )
 
 
-def update_dns_record(domain, sub_domain, public_ip, ttl, secret):
-    url = PORKBUN_EDIT_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
+def update_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
+    url = PORKBUN_EDIT_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     data = {
         **asdict(secret),
@@ -36,13 +36,13 @@ def update_dns_record(domain, sub_domain, public_ip, ttl, secret):
     return False
 
 
-def create_dns_record(domain, sub_domain, public_ip, ttl, secret):
+def create_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
     url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
         **asdict(secret),
         "name": sub_domain or "",
-        "type": "A",
+        "type": record_type,
         "content": public_ip,
         "ttl": str(ttl),
     }
@@ -62,8 +62,8 @@ def create_dns_record(domain, sub_domain, public_ip, ttl, secret):
     return False
 
 
-def get_current_ip(domain, sub_domain, secret):
-    url = PORKBUN_RETRIEVE_URL.format(domain=domain, subdomain=sub_domain or "").rstrip("/")
+def get_current_ip(domain, sub_domain, record_type, secret):
+    url = PORKBUN_RETRIEVE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
     if response.status_code == requests.codes.ok:

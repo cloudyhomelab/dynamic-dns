@@ -1,10 +1,10 @@
 # dynamic-dns
 
-Sync DNS A records for domains hosted with Porkbun.
+Sync DNS A and AAAA records for domains hosted with Porkbun.
 
-For each configured domain or subdomain, dynamic-dns looks up the current A record in Porkbun. It creates the record if it is missing and updates it if the IP address has changed.
+For each configured domain or subdomain, dynamic-dns looks up the current record in Porkbun. It creates the record if it is missing and updates it if the IP address has changed.
 
-Only IPv4 is supported for now: it manages A records (no AAAA), `hostname` and the public IP are resolved to IPv4 addresses, and `ip` must be an IPv4 address.
+The record type follows the IP address: an IPv4 address sets an A record, an IPv6 address an AAAA record. IPv6 is only available through a fixed `ip` for now; `hostname` and the public IP are resolved to IPv4 addresses.
 
 ## Install
 
@@ -54,6 +54,11 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
   subdomains:
     - nas
   ip: 192.168.1.10
+
+- name: example.net
+  subdomains:
+    - nas6
+  ip: "2001:db8::10"
 ```
 
 | Field | Required | Description |
@@ -61,7 +66,7 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 | `name` | yes | Domain registered with Porkbun |
 | `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`). |
 | `hostname` | no | Use the IPv4 address this hostname resolves to |
-| `ip` | no | Use this fixed IP address |
+| `ip` | no | Use this fixed IPv4 or IPv6 address. Quote IPv6 addresses. |
 | `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
 
 Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`; unquoted, the config is rejected.

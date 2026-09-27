@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 PORKBUN_API_BASE_URL = "https://api.porkbun.com/api/json/v3/dns"
-PORKBUN_EDIT_URL = PORKBUN_API_BASE_URL + "/editByNameType/{domain}/A/{subdomain}"
+PORKBUN_EDIT_URL = PORKBUN_API_BASE_URL + "/editByNameType/{domain}/{type}/{subdomain}"
 PORKBUN_CREATE_URL = PORKBUN_API_BASE_URL + "/create/{domain}"
-PORKBUN_RETRIEVE_URL = PORKBUN_API_BASE_URL + "/retrieveByNameType/{domain}/A/{subdomain}"
+PORKBUN_RETRIEVE_URL = PORKBUN_API_BASE_URL + "/retrieveByNameType/{domain}/{type}/{subdomain}"
 PUBLIC_IP_URL = "https://checkip.amazonaws.com/"
 # used when a domain entry has no ttl
 DNS_RECORD_TTL = 600

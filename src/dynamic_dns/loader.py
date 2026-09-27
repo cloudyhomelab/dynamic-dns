@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import ipaddress
 from dataclasses import dataclass, fields
 
 import yaml
@@ -30,6 +31,11 @@ class DomainEntry:
         for subdomain in self.subdomains or []:
             if not isinstance(subdomain, str):
                 raise TypeError(f"{self.name}: subdomains must be str, got {subdomain!r}; quote it in the YAML")
+        if self.ip is not None:
+            try:
+                ipaddress.ip_address(self.ip)
+            except ValueError:
+                raise ValueError(f"{self.name}: ip {self.ip!r} is not an IPv4 or IPv6 address") from None
 
 
 @dataclass

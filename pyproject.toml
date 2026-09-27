@@ -1,7 +1,7 @@
 [project]
 name = "dynamic-dns"
 version = "0.1.0"
-description = "Sync DNS A records for domains hosted with Porkbun"
+description = "Sync DNS A and AAAA records for domains hosted with Porkbun"
 requires-python = ">=3.13"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
