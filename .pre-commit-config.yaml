@@ -15,6 +15,13 @@ repos:
         entry: uv run ruff format
         language: system
         types_or: [python, pyi]
+      # checks the whole package (files in pyproject.toml), not just the staged files
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
       - id: commit-msg
         name: conventional commit message
         entry: .githooks/commit-msg

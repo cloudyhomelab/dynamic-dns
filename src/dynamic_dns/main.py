@@ -5,14 +5,14 @@ import ipaddress
 
 import requests
 
-from dynamic_dns.ip import IpLookup
-from dynamic_dns.loader import load_domains, load_secrets
+from dynamic_dns.ip import IpAddress, IpLookup
+from dynamic_dns.loader import ApiKeys, DomainConfig, load_domains, load_secrets
 from dynamic_dns.porkbun import create_dns_record, delete_dns_record, get_current_ip, update_dns_record
 
 RECORD_TYPES = {4: "A", 6: "AAAA"}
 
 
-def change_my_dns(domain, sub_domain, address, ttl, secret):
+def change_my_dns(domain: str, sub_domain: str | None, address: IpAddress, ttl: int, secret: ApiKeys) -> bool:
     record_type = RECORD_TYPES[address.version]
     prev_ip = get_current_ip(domain, sub_domain, record_type, secret)
 
@@ -27,7 +27,7 @@ def change_my_dns(domain, sub_domain, address, ttl, secret):
     return create_dns_record(domain, sub_domain, record_type, str(address), ttl, secret)
 
 
-def delete_stale_record(domain, sub_domain, record_type, secret):
+def delete_stale_record(domain: str, sub_domain: str | None, record_type: str, secret: ApiKeys) -> bool:
     if get_current_ip(domain, sub_domain, record_type, secret) is None:
         return True
     fqdn = f"{sub_domain}.{domain}" if sub_domain else domain
@@ -35,10 +35,11 @@ def delete_stale_record(domain, sub_domain, record_type, secret):
     return delete_dns_record(domain, sub_domain, record_type, secret)
 
 
-def sync_record(record, lookup, secret):
+def sync_record(record: DomainConfig, lookup: IpLookup, secret: ApiKeys) -> bool:
     fqdn = f"{record.subdomain}.{record.name}" if record.subdomain else record.name
     # socket.gaierror (unresolvable hostname) is an OSError
     try:
+        addresses: list[IpAddress]
         if record.hostname:
             addresses = lookup.resolve(record.hostname)
         elif record.ip:
@@ -46,7 +47,7 @@ def sync_record(record, lookup, secret):
         else:
             addresses = lookup.resolve()
         # one record per address family (A and/or AAAA); keep going if one fails
-        results = []
+        results: list[bool] = []
         for address in addresses:
             print(f"setting up {fqdn} for hostname {record.hostname} or ip {address}")
             results.append(change_my_dns(record.name, record.subdomain, address, record.ttl, secret))
@@ -62,7 +63,7 @@ def sync_record(record, lookup, secret):
         return False
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(prog="dynamic-dns", description="Sync DNS records in Porkbun")
     parser.add_argument(
         "-a",

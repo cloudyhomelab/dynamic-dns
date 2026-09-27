@@ -11,9 +11,12 @@ from dynamic_dns.config import (
     PORKBUN_RETRIEVE_URL,
     REQUEST_TIMEOUT_SECONDS,
 )
+from dynamic_dns.loader import ApiKeys
 
 
-def update_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
+def update_dns_record(
+    domain: str, sub_domain: str | None, record_type: str, public_ip: str, ttl: int, secret: ApiKeys
+) -> bool:
     url = PORKBUN_EDIT_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     data = {
@@ -37,7 +40,9 @@ def update_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
     return False
 
 
-def create_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
+def create_dns_record(
+    domain: str, sub_domain: str | None, record_type: str, public_ip: str, ttl: int, secret: ApiKeys
+) -> bool:
     url = PORKBUN_CREATE_URL.format(domain=domain)
 
     data = {
@@ -63,7 +68,7 @@ def create_dns_record(domain, sub_domain, record_type, public_ip, ttl, secret):
     return False
 
 
-def delete_dns_record(domain, sub_domain, record_type, secret):
+def delete_dns_record(domain: str, sub_domain: str | None, record_type: str, secret: ApiKeys) -> bool:
     url = PORKBUN_DELETE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
@@ -77,7 +82,7 @@ def delete_dns_record(domain, sub_domain, record_type, secret):
     return False
 
 
-def get_current_ip(domain, sub_domain, record_type, secret):
+def get_current_ip(domain: str, sub_domain: str | None, record_type: str, secret: ApiKeys) -> str | None:
     url = PORKBUN_RETRIEVE_URL.format(domain=domain, type=record_type, subdomain=sub_domain or "").rstrip("/")
 
     response = requests.post(url, json=asdict(secret), timeout=REQUEST_TIMEOUT_SECONDS)
@@ -85,5 +90,6 @@ def get_current_ip(domain, sub_domain, record_type, secret):
     response.raise_for_status()
     records = response.json()["records"]
     if records:
-        return records[0]["content"]
+        content: str = records[0]["content"]
+        return content
     return None
