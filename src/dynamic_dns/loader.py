@@ -10,6 +10,17 @@ import yaml
 from dynamic_dns.config import DNS_RECORD_TTL
 
 
+def _type_name(expected: Any) -> str:
+    # unions have a __name__ of "Union" on Python 3.14+, so spell them out
+    if isinstance(expected, UnionType):
+        return " | ".join(_type_name(option) for option in get_args(expected))
+    if expected is type(None):
+        return "None"
+    if get_origin(expected):
+        return str(expected)
+    return str(expected.__name__)
+
+
 def _matches(value: object, expected: Any) -> bool:
     # isinstance() rejects parameterized generics such as list[str], so check their base type
     options = get_args(expected) if isinstance(expected, UnionType) else (expected,)
@@ -36,8 +47,7 @@ class _Validated:
             if (isinstance(value, bool) and expected is not bool) or not _matches(value, expected):
                 hint = "; quote it in the YAML" if expected in (str, str | None) else ""
                 raise TypeError(
-                    f"{self._prefix()}{name} must be {getattr(expected, '__name__', expected)}, "
-                    f"got {self._describe(value)}{hint}"
+                    f"{self._prefix()}{name} must be {_type_name(expected)}, got {self._describe(value)}{hint}"
                 )
 
 
