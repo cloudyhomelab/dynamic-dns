@@ -4,7 +4,7 @@ Sync DNS A and AAAA records for domains hosted with Porkbun.
 
 For each configured domain or subdomain, dynamic-dns looks up the current record in Porkbun. It creates the record if it is missing and updates it if the IP address has changed.
 
-The record type follows the IP address: an IPv4 address sets an A record, an IPv6 address an AAAA record. IPv6 is only available through a fixed `ip` for now; `hostname` and the public IP are resolved to IPv4 addresses.
+The record type follows the IP address: an IPv4 address sets an A record, an IPv6 address an AAAA record. When the IP source has both (a dual-stack `hostname`, or a public IPv6 address), both records are synced.
 
 ## Install
 
@@ -65,17 +65,17 @@ A YAML list of entries (sample: [`examples/domains.yaml`](examples/domains.yaml)
 |---|---|---|
 | `name` | yes | Domain registered with Porkbun |
 | `subdomains` | no | Subdomains to sync. Omit to sync the domain itself (`example.org`). |
-| `hostname` | no | Use the IPv4 address this hostname resolves to |
+| `hostname` | no | Use the addresses this hostname resolves to: its first IPv4 (A) and first IPv6 (AAAA) address |
 | `ip` | no | Use this fixed IPv4 or IPv6 address. Quote IPv6 addresses. |
 | `ttl` | no | Record TTL in seconds (default 600, the Porkbun minimum) |
 
 Quote subdomains that YAML would read as booleans or numbers, such as `"no"`, `"on"` or `"1"`; unquoted, the config is rejected.
 
-Where the IP address comes from, in order:
+Where the IP addresses come from, in order:
 
 1. `hostname`, if set
 2. `ip`, if set
-3. otherwise, this machine's public IP address (from `checkip.amazonaws.com`)
+3. otherwise, this machine's public IPv4 address (from `checkip.amazonaws.com`, required) and public IPv6 address (from `api6.ipify.org`, skipped with a note if the machine has no IPv6)
 
 ## Run periodically with systemd
 
